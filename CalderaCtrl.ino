@@ -56,17 +56,17 @@ void setup()
 void loop() 
 {
   char ack_msg[12];
-  if (vw_get_message(radio_msg, &buflen)) // Non-blocking
+  if (vw_get_message(radio_msg, &buflen) && (buflen==8)) // Non-blocking
   //if (vw_have_message())
   {
     vw_rx_stop();
-    if(comparar("0001-ON") == 0){
+    if(comparar("0001-ON_", 8) == 0){
       digitalWrite(PIN_RELE, true);
       send("0100-ON-ACK");
       count_max = 25000;
       safe_counter = 0;
     }
-    else if(comparar("0001-OFF") == 0)
+    else if(comparar("0001-OFF", 8) == 0)
     {
       stop_heater();
     } 
@@ -108,11 +108,11 @@ void send (char *message)
   vw_wait_tx(); //Espera hasta que se haya acabado de transmitir todo
 }
 
-char comparar(char* cadena) {
+char comparar(char* cadena, int len) {
   //Esta funcion compara el string cadena con el mensaje recibido.
   //Si son iguales, devuelve 1. Si no, devuelve 0.
   
-  for(int i = 0; i<buflen; i++)
+  for(int i = 0; i<len; i++)
   {
     if(radio_msg[i] != cadena[i])
     {
@@ -120,6 +120,6 @@ char comparar(char* cadena) {
     }
   }
  
-    return 0;
+  return 0;
 }
 
