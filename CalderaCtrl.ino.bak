@@ -1,14 +1,14 @@
 /** \file CalderaCtrl.ino
  * Control for Caldera. RF communication
- * This program runs in the ATTINY85 hardware.
+ * This program runs in the TTINY hardware.
  * Miguel A. 10 Febrero 2018
  * Arduino Digispark ATTINY85
  * Default -16.5mhz
  */
 
-/*! \mainpage Caldera control.
+/*! \mainpage A Brief Description.
 \section my-intro Introduction
- P3 OUTPUT DATA TX
+ P0 OUTPUT DATA TX
  P2 INPUT DATA RX
 
 */
@@ -22,13 +22,16 @@
 #define PIN_RX    2
 #define PIN_TX    3
 
-#define SAFE_TIMEOUT 4000 //segundos
+#define SAFE_TIMEOUT 330 //segundos
+#define HIGH_SPEED  24028
+#define LOW_SPEED  50000
 
 uint8_t radio_msg[LEN_BUFFER_RX];  //Data transmission buffer
 uint8_t buflen = sizeof(radio_msg);
 double count=0;
-double count_max=50000;    // 1 segundo;
+double count_max=LOW_SPEED;
 double safe_counter=0;
+bool in =false;
   
 /** \fn void setup
 	It initializes the variables and configures the hardware
@@ -42,72 +45,63 @@ void setup()
   
   wdt_disable();    // No te olvides
  
-  //vw_set_tx_pin(PIN_TX);
+  vw_set_tx_pin(PIN_TX);
   vw_set_rx_pin(PIN_RX);
 
   vw_setup(2000);   // Bits per sec
   vw_rx_start();       // Start the receiver PLL running 
 
-  //wdt_enable(WDTO_1S);
+  wdt_enable(WDTO_1S);
 }
 
 void loop() 
 {
-  int n_loop;
   char ack_msg[12];
-  buflen = LEN_BUFFER_RX;
-  if (vw_get_message(radio_msg, &buflen) && (buflen==LEN_BUFFER_RX)) // Non-blocking
+  if (vw_get_message(radio_msg, &buflen) && (buflen==8)) // Non-blocking
+  //if (vw_have_message())
   {
-    digitalWrite(PIN_LED, true); 
-    //vw_rx_stop();
+    vw_rx_stop();
     if(comparar("0001-ON_", 8) == 0){
       digitalWrite(PIN_RELE, true);
-      //send("0100-ON-ACK");
+      send("0100-ON-ACK");
+      count_max = HIGH_SPEED;
       safe_counter = 0;
-      n_loop = 2;
     }
     else if(comparar("0001-OFF", 8) == 0)
     {
       stop_heater();
-      n_loop = 1;
-      safe_counter = 0;
     } 
-    else
-      n_loop = 0;
-    //vw_rx_start();
-    delay(250);
-    digitalWrite(PIN_LED, false); 
-    for (int x=0;x<n_loop;x++)
-    {
-      delay(250);
-      digitalWrite(PIN_LED, true); 
-      delay(250);
-      digitalWrite(PIN_LED, false);  
-    }
+    vw_rx_start();
   }
   else
   {
     if (count==0)
     {
-      safe_counter++;
-      if (safe_counter >= SAFE_TIMEOUT)
+      if (in == true)
+        in = false;
+      else
       {
+       in = true;
+       safe_counter++;
+       if (safe_counter >= SAFE_TIMEOUT)
+       {
         stop_heater();
-        safe_counter=0;
+       }
       }
+      digitalWrite(PIN_LED, in); 
       count=count_max;
     }
     else count--;
   }
-  //wdt_reset();
+  wdt_reset();
 }
 
 void stop_heater()
 {
   digitalWrite(PIN_RELE, false);
-  //send("0100-OFF-ACK");
+  send("0100-OFF-ACK");
+  count_max = LOW_SPEED; 
 }
-
 //Funcion para enviar el mensaje
 void send (char *message)
 {
