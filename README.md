@@ -15,20 +15,23 @@ Virtual Wire
  ## Configuración hardware
  ### Arduino Digispark ATTINY85
  ENTRADAS
- Pin1 Led
- Pin2 Datos del receptor de radio
+ - Pin1 Led  
+ - Pin2 Datos del receptor de radio  
  
  SALIDAS:
- Pin0 Activación de Relé
- Pin3 Datos al trasnmisor de radio
+ - Pin0 Activación de Relé  
+ - Pin3 Datos al trasnmisor de radio  
 
+## Comandos  
+Controla la caldera con las ordenes recibidas por radio.  
+| Comando  | Descripción |
+| ------------- | ------------- |
+| 0001-ON_	| Activa la caldera |  
+| 0001-OFF	| Desactiva la caldera |  
 
-Controla la caldera con las ordenes recibidas por radio.
-0001-ON_	Activa la caldera
-0001-OFF	Desactiva la caldera
-
-Led con destello rapido para ON, y destello lento para OFF.
-3 Destellos de confirmación
+Led con destello para confirmar la recepción del comando.  
+- 3 Destellos para confirmar la recepción del comando de encendido  
+- 2 Destellos para confirmar la recepción del comando de apagado  
 
 Sistema de apagado automatico cuando no recibe nueva orden en 3 minutos.
 
