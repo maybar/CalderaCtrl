@@ -5,10 +5,14 @@ La aplicación recibe por radio los comandos para encender y apagar la caldera.
 Microntrolador:
  * Arduino Digispark ATTINY85
  * Default -16.5mhz
- 
+   
+ ![image](https://github.com/maybar/CalderaCtrl/assets/11490155/986ca3d5-7a06-42bf-97e4-3fc7e3754888)
+
  Radio usada:
  485MHz AM
- 
+
+ ![image](https://github.com/maybar/CalderaCtrl/assets/11490155/37e3c7ac-56a8-4119-8c0a-d575b74ee00f)
+
  Librerias:
 Virtual Wire
  
